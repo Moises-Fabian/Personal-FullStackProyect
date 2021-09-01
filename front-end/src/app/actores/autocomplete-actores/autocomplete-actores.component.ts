@@ -1,8 +1,10 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatTable } from '@angular/material/table';
+import { actorPeliculaDTO } from '../actor';
+import { ActoresService } from '../actores.service';
 
 @Component({
   selector: 'app-autocomplete-actores',
@@ -11,28 +13,24 @@ import { MatTable } from '@angular/material/table';
 })
 export class AutocompleteActoresComponent implements OnInit {
 
-  constructor() { }
+  constructor(private actoresService: ActoresService) { }
 
   control: FormControl = new FormControl();
 
-  actores = [{nombre: 'Tom Holland', personajes: '',  foto: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Tom_Holland_by_Gage_Skidmore.jpg/1200px-Tom_Holland_by_Gage_Skidmore.jpg'},
-             {nombre: 'Tom Hanks', personajes: '', foto: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Tom_Hanks_TIFF_2019.jpg'},
-             {nombre: 'Samuel L. Jackson', personajes: '', foto: 'https://es.web.img3.acsta.net/c_310_420/pictures/15/07/27/12/24/354255.jpg'}
-            ]
+  @Input()
+  actoresSeleccionados: actorPeliculaDTO [] = [];
 
-  actoresOriginal = this.actores;
+  actoresAMostrar: actorPeliculaDTO [] = [];
 
-  actoresSeleccionados: any = [];
-
-  columnasAMostrar = ['imagen', 'nombre', 'personajes', 'acciones'];
+  columnasAMostrar = ['imagen', 'nombre', 'personajes', 'acciones']
 
   @ViewChild(MatTable) table!: MatTable<any>;
 
   ngOnInit(): void {
-    this.control.valueChanges.subscribe(valor => {
-      this.actores = this.actoresOriginal;
-      this.actores = this.actoresOriginal.filter(actor =>
-        actor.nombre.indexOf(valor) !== -1);
+    this.control.valueChanges.subscribe(nombre => {
+      this.actoresService.obtenerPorNombre(nombre).subscribe(actores =>{
+        this.actoresAMostrar = actores;
+      })
     })
   }
 

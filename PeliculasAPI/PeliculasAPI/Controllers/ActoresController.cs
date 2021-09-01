@@ -48,6 +48,17 @@ namespace PeliculasAPI.Controllers
             return mapper.Map<ActorDTO>(actor);
         }
 
+        [HttpPost("buscarPorNombre")]
+        public async Task<ActionResult<List<PeliculaActorDTO>>> BuscarPorNombre([FromBody] string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre)) { return new List<PeliculaActorDTO>(); }
+            return await context.Actores
+                .Where(x => x.nombre.Contains(nombre))
+                .Select(x => new PeliculaActorDTO { id = x.id, nombre = x.nombre, foto = x.foto })
+                .Take(5)
+                .ToListAsync();       
+        }
+
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromForm] CreateActorDTO createActorDTO)
         {
